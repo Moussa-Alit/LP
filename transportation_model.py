@@ -2,8 +2,7 @@
 def get_key(val, the_dict):
     for key, value in the_dict.items():
         if val == value:
-            return key
- 
+            return key 
     return "key doesn't exist"
 
 class TransportationModel():
@@ -116,7 +115,6 @@ class TransportationModel():
         #Rule: Ui + Vj = cij
         self.Us["U1"] = 0
         for cell in self.basic_cells:
-            print(cell)
             if f"U{cell[1]}" in self.Us: #checking the presence of Ui #cell[1] is the second character in the key's string
                 self.Vs[f"V{cell[2]}"] = self.costs[cell] - self.Us[f"U{cell[1]}"]
             elif f"V{cell[2]}" in self.Vs:
@@ -145,51 +143,59 @@ class TransportationModel():
             return False
 
     def entering_leaving_vars(self):
-        entering_var = get_key(max(self.reduced_costs), self.reduced_costs)
+        print("Reduced costs: ",self.reduced_costs)
+        print(f"Max reduced cost: {max(self.reduced_costs.values())}")
+        entering_var = get_key(max(self.reduced_costs.values()), self.reduced_costs)
+        print(entering_var, entering_var[1], entering_var[2])
         c = 0
         teta_loop_basic_cells = {}
-        for cell in self.basic_cells:
+        for cell in self.basic_cells: #just for counting
             c += 1 #counter is to one iteration go and find nearest in row, the second go and find in same col
             if (c % 2) != 0:
                 #FIND THE NEAREST(from the act cell(can use nearest from entering var fir all but not beautiful)) BASIC CELL IN THE SAME ROW(SOURCE)
+                distances_values = {}
                 for cell1 in self.basic_cells:
-                    distances_values = {}
-                    if cell1[1] == cell[1]: #filtering cells in the same row
-                        print(int(cell[2]), int(cell1[2]))
-                        distance = int(cell1[2]) - int(cell[2]) #distance is how many dest cell1 is away from cell
+                    print(cell1)                    
+                    if cell1[1] == entering_var[1]: #filtering cells in the same row
+                        print(int(entering_var[2]), int(cell1[2]))
+                        distance = int(cell1[2]) - int(entering_var[2]) #distance is how many dest cell1 is away from cell
                         print(distance)
                         if distance < 0:
                             distance = -distance #we need absolute value of distance
                         print(distance)
                         distances_values[cell1] = distance
-                print(min(distances_values))
-                nearest = get_key(min(distances_values), distances_values)
-                print(min(distances_values))
+                print(f"Distances values: {distances_values.values()}")
+                nearest = get_key(min(distances_values.values()), distances_values)
+                print(min(distances_values.values()))
                 print(f"Nearest is {nearest}")
                 #now we create an item with key : cell index Xij; & value of basic cell value
                 teta_loop_basic_cells[nearest] = self.basic_cells[nearest]
             else:
-                for cell1 in self.basic_cells:
-                    distances_values = {} #why its a local variable because its a temper dict
-                    if cell[2] == cell1[2]: #filtering cells in same col
-                        distance = int(cell1[1]) - int(cell[1])
+                distances_values = {} #why its a local variable because its a temper dict
+                for cell1 in self.basic_cells:                   
+                    if entering_var[2] == cell1[2]: #filtering cells in same col
+                        distance = int(cell1[1]) - int(entering_var[1])
                     if distance < 0:
                         distance = -distance
                     distances_values[cell1] = distance
-                nearest = get_key(min(distances_values), distances_values)
+                nearest = get_key(min(distances_values.values()), distances_values)
                 print(f"Nearest is {nearest}")
                 teta_loop_basic_cells[nearest] = self.basic_cells[nearest]
                 #find the nearest basic cell in the same column(destination)
-        teta_value = min(teta_loop_basic_cells)
+        print("Teta loopbasic_cells:\n", teta_loop_basic_cells)
+        teta_value = min(teta_loop_basic_cells.values())
+        print(teta_value, type(teta_value))
         #now we should calculate the new values
         c = 0
         for cell in teta_loop_basic_cells:
+            print(cell)
             c += 1
             if c % 2 != 0:
+                print(teta_loop_basic_cells[cell], type(teta_loop_basic_cells[cell]))
                 teta_loop_basic_cells[cell] += teta_value
             else:
                 teta_loop_basic_cells[cell] -= teta_value
-        leaving_var = get_key(min(teta_loop_basic_cells), teta_loop_basic_cells)
+        leaving_var = get_key(min(teta_loop_basic_cells.values()), teta_loop_basic_cells)
         self.basic_cells.pop(leaving_var) #removing leaving variable
         self.basic_cells[entering_var] = teta_value #adding entering variable to basic cells
         #Now I will itarate over basic cells to change the values if needed
@@ -214,3 +220,8 @@ class TransportationModel():
         if check: #if True
             return "Optimal"
         self.entering_leaving_vars()
+
+TransportationModel().do_all(3, 4)
+
+#returned infinite recrusion
+#max reduced cost is always the same
