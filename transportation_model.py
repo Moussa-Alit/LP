@@ -56,7 +56,7 @@ class TransportationModel():
             if self.dests_demands[f"D{self.c1}"] > 0:
                 print("Going to continue_fillig_demands")
                 self.continue_filling_demand(self.c, self.c1)#hayk bnkoun ksebna sha8ltayn bfard darbe tracked value of c & continued filling demand
-        #self.check_4_not_eliminated_but_zero()
+        self.check_4_not_eliminated_but_zero()
         print(self.basic_cells)
         return self.basic_cells
 
@@ -77,12 +77,14 @@ class TransportationModel():
         #this will occur when dest_demands/dest_rest == sources_supp/sources_rest so after substracting the source will be 0 and the dest
         #I can check using this method, but I prefer to use another to keep fill_cells simple
         #indexes method
-        temper_dict = {self.basic_cells.values()[0]}
+        temper_dict = {list(self.basic_cells.keys())[0] :list(self.basic_cells.values())[0]} #start from the first basic cell as previous cell        
         for cell in self.basic_cells:
+            if cell == list(self.basic_cells.keys())[0]:
+                continue
             c = int(cell[1])
             c1 = int(cell[2])
-            if (c - int(temper_dict[-1][1])) != 0 and (c1 - int(temper_dict[-1][2])) != 0: #=> diagonal path 
-                self.basic_cells[f"X{c-1}{c1}"]
+            if (c - int(list(temper_dict.keys())[-1][1])) != 0 and (c1 - int(list(temper_dict.keys())[-1][2])) != 0: #=> diagonal path 
+                self.basic_cells[f"X{c-1}{c1}"] = 0
             temper_dict[cell] = self.basic_cells[cell]
         #what I did , I substracted indexes from the last temper dict item wich is the previous basic cell and the act cell, to be a horizantal pass or vertical pass a substraction should be 0
         #so if both are not 0 => diagonal pass; => return one source backward at the same dest and add a basic_cell 
