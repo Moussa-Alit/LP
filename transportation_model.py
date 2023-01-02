@@ -309,7 +309,11 @@ class TransportationModel():
             return "Optimal"
         self.redo()
 
-#TransportationModel().enter_leave_vars()
-TransportationModel().do_all(3, 4)
-#returned infinite recrusion
-#max reduced cost is always the same
+
+def take_input_and_do_all():
+    sources_nb = int(input("Enter the sources nb:\n"))
+    dests_nb = int(input("Enter destinations nb:\n"))
+    return TransportationModel().do_all(sources_nb, dests_nb)
+
+if __name__ == '__main__':
+    take_input_and_do_all()
